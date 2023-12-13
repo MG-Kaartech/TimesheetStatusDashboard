@@ -1,0 +1,114 @@
+<mvc:View
+    controllerName="com.mgc.timesheetdashboardui.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:webc="sap.ui.webc.main"
+>
+    <Page
+        id="page"
+        title="{i18n>title}"
+    >
+        <customHeader>
+            <OverflowToolbar>
+                <content>
+                    <ToolbarSpacer />
+                    <Title text="{i18n>title}" />
+                    <ToolbarSpacer />
+                </content>
+            </OverflowToolbar>
+        </customHeader>
+        <content>
+            <fb:FilterBar
+                reset="onReset"
+                search="onSearch"
+                showFilterConfiguration="true"
+            >
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        groupName="group1"
+                        name="Resource"
+                        label="{i18n>resource}"
+                        visibleInFilterBar="true"
+                        mandatory="true"
+                    >
+                        <fb:control>
+                            <MultiInput
+                                id="resInput"
+                                placeholder="{i18n>resource}"
+                                showValueHelp="true"
+                                valueHelpRequest="handleValueHelp"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        groupName="group1"
+                        name="Start Date"
+                        label="{i18n>startDate}"
+                        visibleInFilterBar="true"
+                        mandatory="true"
+                    >
+                        <fb:control>
+                            <DatePicker
+                                id="idStDate"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="yyyy-MM-dd"
+                                placeholder="{i18n>startDate}"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        groupName="group1"
+                        name="Finish Date"
+                        label="{i18n>finishDate}"
+                        visibleInFilterBar="true"
+                        mandatory="true"
+                    >
+                        <fb:control>
+                            <DatePicker
+                                id="idFnDate"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="yyyy-MM-dd"
+                                placeholder="{i18n>finishDate}"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+            <Table
+                id="timesheetDashboard"
+                autoPopinMode="true"
+                sticky="ColumnHeaders,HeaderToolbar"
+                items="{valueHelp>/Rows}"
+                growing="true"
+                growingThreshold="50"
+                growingScrollToLoad="true"
+                columns="{valueHelp>/Columns}" 
+            >
+                <columns >
+                    <Column width="5rem">
+                        <Label text="{valueHelp>date}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" press="onTimePeriodListItemSelect">
+                        <cells>
+                            <ObjectIdentifier title="{valueHelp>EmployeeID}"/>
+                            <ObjectIdentifier title="{valueHelp>EmployeeName}"/>
+                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours1'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status1'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
+                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours2'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status2'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
+                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours3'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status3'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
+                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours4'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status4'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
+                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours5'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status5'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
+                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours6'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status6'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
+                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours7'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status7'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
+
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

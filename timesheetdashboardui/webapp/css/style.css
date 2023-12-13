@@ -1,0 +1,12 @@
+/* Enter your custom styles here */
+.sapMIBar.sapMHeader-CTX {
+    color: #1d2d3e;
+    background-color: #fff;
+    filter: none;
+    background-image: url(https://www.municipalgroup.com/sites/municipalGroup/img/municipal-group-logo.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: 1px solid #ddd !important;
+    padding: 5px !important;
+    object-fit: cover;
+}
