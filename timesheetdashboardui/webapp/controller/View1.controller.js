@@ -324,8 +324,7 @@ sap.ui.define([
             },
             exportTimeData: function () {
                 var rows = [];
-                var fileName = "Template.xlsx";
-
+                var fileName = "TimesheetStatusDashboard.xlsx";
                 var Columns = this.getView().getModel("valueHelp").getData().Columns;
                 var aa = Object.assign({}, Columns);
                 var selectedRow = this.getView().byId("timesheetSheetDashboard").getItems();
@@ -336,52 +335,66 @@ sap.ui.define([
                     if (data.EmployeeID !== "") {
                         obj[aa[0].date] = data.EmployeeID;
                         obj[aa[1].date] = data.EmployeeName;
-                        obj[aa[2].date] = this.SaveSubmitStatusText(data.status1);
-                        obj.Hours1 = this.HoursValue(data.hours1);
-                        obj[aa[3].date] = this.SaveSubmitStatusText(data.status2);
-                        obj.Hours2 = this.HoursValue(data.hours2);
-                        obj[aa[4].date] = this.SaveSubmitStatusText(data.status3);
-                        obj.Hours3 = this.HoursValue(data.hours3);
-                        obj[aa[5].date] = this.SaveSubmitStatusText(data.status4);
-                        obj.Hours4 = this.HoursValue(data.hours4);
-                        obj[aa[6].date] = this.SaveSubmitStatusText(data.status5);
-                        obj.Hours5 = this.HoursValue(data.hours5);
-                        obj[aa[7].date] = this.SaveSubmitStatusText(data.status6);
-                        obj.Hours6 = this.HoursValue(data.hours6);
-                        obj[aa[8].date] = this.SaveSubmitStatusText(data.status7);
-                        obj.Hours7 = this.HoursValue(data.hours7);
+                        try {
+                            obj[aa[2].date] = this.SaveSubmitStatusText(data.status1);
+                            obj.Hours1 = this.HoursValue(data.hours1);
+                        } catch (err) { }
+                        try {
+                            obj[aa[3].date] = this.SaveSubmitStatusText(data.status2);
+                            obj.Hours2 = this.HoursValue(data.hours2);
+                        } catch (err) { }
+                        try {
+                            obj[aa[4].date] = this.SaveSubmitStatusText(data.status3);
+                            obj.Hours3 = this.HoursValue(data.hours3);
+                        } catch (err) { }
+                        try {
+                            obj[aa[5].date] = this.SaveSubmitStatusText(data.status4);
+                            obj.Hours4 = this.HoursValue(data.hours4);
+                        } catch (err) { }
+                        try {
+                            obj[aa[6].date] = this.SaveSubmitStatusText(data.status5);
+                            obj.Hours5 = this.HoursValue(data.hours5);
+                        } catch (err) { }
+                        try {
+                            obj[aa[7].date] = this.SaveSubmitStatusText(data.status6);
+                            obj.Hours6 = this.HoursValue(data.hours6);
+                        } catch (err) { }
+                        try {
+                            obj[aa[8].date] = this.SaveSubmitStatusText(data.status7);
+                            obj.Hours7 = this.HoursValue(data.hours7);
+                        } catch (err) { }
                         rows.push(obj);
                     }
 
                 }
                 var workbook = XLSX.utils.book_new();
                 var worksheet = XLSX.utils.json_to_sheet(rows);
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Import Holiday");
+                XLSX.utils.book_append_sheet(workbook, worksheet, "TimesheetStatusDashboard");
                 XLSX.writeFile(workbook, fileName, { compression: true });
             },
-            SaveSubmitStatusText:function(status){
+            SaveSubmitStatusText: function (status) {
                 var count = 0;
-                if(status == null || status == "" || status == undefined){
+                if (status == null || status == "" || status == undefined) {
                     return "Open";
                 }
-                else{
+                else {
                     status.split("#").forEach(index => {
                         if (index !== "" && index != 'Approved') {
                             count++;
                         }
                     })
                 }
-                if(count == 0){
+                if (count == 0) {
                     return "Approved";
-                }else{
+                } else {
                     return "Inprogress";
                 }
             },
-            HoursValue:function(val){
-                if(val == null || val == undefined || val == ""){
+            HoursValue: function (val) {
+                if (val == null || val == undefined || val == "") {
                     return 0;
                 }
-                else{
+                else {
                     return val;
                 }
             }
