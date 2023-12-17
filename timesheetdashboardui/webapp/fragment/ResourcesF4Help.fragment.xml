@@ -16,6 +16,6 @@
 		multiSelect="true">
 		<StandardListItem id="idStdTable"
 			title="{valueHelp>FirstName} {valueHelp>LastName}"
-			description="{valueHelp>ID}" />
+			description="{valueHelp>ID}"/>
 	</SelectDialog>
 </core:FragmentDefinition>

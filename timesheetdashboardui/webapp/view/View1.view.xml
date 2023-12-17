@@ -27,12 +27,20 @@
                 showFilterConfiguration="true"
             >
                 <fb:filterGroupItems>
+                <fb:FilterGroupItem
+                    groupName="group1"
+                    name="Company"
+                    label="{i18n>company}"
+                    visibleInFilterBar="true">
+                    <fb:control>
+                        <Input id="companyTimeSheet" placeholder="{i18n>company}" showValueHelp="true" valueHelpRequest="onCompanyF4"/>
+                    </fb:control>
+                </fb:FilterGroupItem>
                     <fb:FilterGroupItem
                         groupName="group1"
                         name="Resource"
                         label="{i18n>resource}"
                         visibleInFilterBar="true"
-                        mandatory="true"
                     >
                         <fb:control>
                             <MultiInput
@@ -78,7 +86,7 @@
                 </fb:filterGroupItems>
             </fb:FilterBar>
             <Table
-                id="timesheetDashboard"
+                id="timesheetSheetDashboard"
                 autoPopinMode="true"
                 sticky="ColumnHeaders,HeaderToolbar"
                 items="{valueHelp>/Rows}"
@@ -87,6 +95,17 @@
                 growingScrollToLoad="true"
                 columns="{valueHelp>/Columns}" 
             >
+            <headerToolbar>
+                    <OverflowToolbar>
+                        <ToolbarSpacer />
+                        <Button
+                            icon="sap-icon://download-from-cloud"
+                            text="{i18n>export}"
+                            type="Ghost"
+                            press="exportTimeData"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
                 <columns >
                     <Column width="5rem">
                         <Label text="{valueHelp>date}" />

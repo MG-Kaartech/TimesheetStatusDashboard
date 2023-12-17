@@ -1,0 +1,61 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+>
+    <Dialog
+        class="sapUiContentPadding"
+        title="{i18n>company}"
+        contentWidth="35%"
+    >
+        <content>
+            <Table id="idCompanyTimesheetTable" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="50" growingScrollToLoad="true"
+            items="{
+			path: 'valueHelp>/company',
+			sorter: {
+				path: 'name'
+			}
+		}">
+                <headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<SearchField search="onSearchCompany" liveChange="onSearchCompany"></SearchField>
+					<ToolbarSpacer />
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>id}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>country}"  />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>name}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" press="onSelectCompany">
+                        <cells>
+                            <Text text="{valueHelp>externalCode}"/>
+                            <Text text="{valueHelp>country}" />
+                            <Text text="{valueHelp>name}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    type="Negative"
+                    text="Close"
+                    press="oCompanyF4HelpCancel"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

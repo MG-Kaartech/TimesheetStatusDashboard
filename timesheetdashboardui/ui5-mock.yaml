@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
-
 specVersion: "3.1"
 metadata:
   name: com.mgc.timesheetdashboardui
@@ -9,7 +7,7 @@ server:
     - name: fiori-tools-proxy
       afterMiddleware: compression
       configuration:
-        ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        ignoreCertError: false
         ui5:
           path:
             - /resources
@@ -19,6 +17,9 @@ server:
           - path: /v2
             url: https://municipal-enterprises-limited-dev-municipalgroup-e7dzir6beb8c90.cfapps.ca10.hana.ondemand.com
             destination: MGCAPI
+          - path: /odata
+            url: https://api47preview.sapsf.com
+            destination: sap-sf-emp-central
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
@@ -35,3 +36,12 @@ server:
             mockdataPath: ./webapp/localService/data
             generateMockData: true
         annotations: []
+        service:
+          - urlPath: /v2/mgcdb-srv
+            generateMockData: true
+            metadataXmlPath: ./webapp/localService/mainService/metadata.xml
+            mockdataRootPath: ./webapp/localService/data
+          - urlPath: /odata/v2/
+            metadataXmlPath: ./webapp/localService/v2/metadata.xml
+            mockdataRootPath: ./webapp/localService/v2/mockdata
+            generateMockData: true

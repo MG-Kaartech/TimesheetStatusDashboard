@@ -19,6 +19,9 @@ server:
           - path: /v2
             url: https://municipal-enterprises-limited-dev-municipalgroup-e7dzir6beb8c90.cfapps.ca10.hana.ondemand.com
             destination: MGCAPI
+          - path: /odata
+            url: https://api47preview.sapsf.com
+            destination: sap-sf-emp-central
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
