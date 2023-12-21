@@ -1,0 +1,154 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+>
+    <Dialog id="idTimesheetDialog"
+        class="sapUiContentPadding"
+        contentWidth="100%"
+        title="{i18n>timePeriod}"
+    >
+        <ObjectHeader
+            id="idTimesheetTotalValues"
+            title="{valueHelp>/timePeriod/0/EmployeeName}"
+            number=""
+            numberUnit="{i18n>hours}"
+            numberState="Success"
+            backgroundDesign="Translucent"
+            class="sapUiResponsivePadding--header"
+        >
+            <ObjectAttribute
+                text="EmployeeID: {valueHelp>/timePeriod/0/EmployeeID}"
+            />
+            <ObjectAttribute
+                text="ApproverName: {valueHelp>/timePeriod/0/PayrollApprovalName}"
+            />
+            <statuses>
+                <ObjectStatus
+                    title="{i18n>appName}"
+                    text="{valueHelp>/timePeriod/0/AppName}"
+                    state="Information"
+                />
+                <ObjectStatus
+                    title="{i18n>status}"
+                    text="{ parts: [ {path: 'valueHelp>/timePeriod/0/PayrollApprovalStatus'} ], formatter: '.formatter.PayrollApprStatusName'}"
+                    state="{ parts: [ {path: 'valueHelp>/timePeriod/0/PayrollApprovalStatus'} ], formatter: '.formatter.Status' }"
+                />
+            </statuses>
+        </ObjectHeader>
+        <content>
+            <ScrollContainer
+                height="100%"
+                width="100%"
+                vertical="true"
+                horizontal="true"
+                focusable="false"
+            >
+                <Table
+                    id="idTimeSheetTable"
+                    items="{valueHelp>/timePeriod}"
+                    mode="None"
+                    sticky="ColumnHeaders"
+                    inset="false"
+                    growing="true"
+                    class="timePeriodTable"
+                    width="135%"
+                >
+                    <columns>
+                        <Column width="7.5rem">
+                            <Text text="{i18n>date}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>payCode}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>costCenter}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>activity}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>workOrder}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>job}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>section}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>phaseCode}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>hours}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>approver}" />
+                        </Column>
+                        <Column hAlign="End">
+                            <Text text="{i18n>timesheetStatus}" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle">
+                            <cells>
+                                <Text text="{valueHelp>Date}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>PayCode'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>CostCenter'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>Activity'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>WorkOrder'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>Job'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>Section'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>Phase'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{valueHelp>TotalHours}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>ManagerApprovalName'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <ObjectNumber
+                                    number="{valueHelp>SaveSubmitStatus}"
+                                    state="{ parts: [ {path: 'valueHelp>SaveSubmitStatus'} ], formatter: '.formatter.Status' }"
+                                />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </ScrollContainer>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    type="Negative"
+                    text="Close"
+                    press="timeSheetDialogCancel"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

@@ -10,11 +10,12 @@ sap.ui.define([
     "com/mgc/timesheetdashboardui/util/XLSX",
     "com/mgc/timesheetdashboardui/util/FullMin",
     "com/mgc/timesheetdashboardui/util/JsZip",
+    'sap/m/MessageToast'
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, MessageBox, Filter, FilterOperator, Fragment, JSONModel, Token, formatter, XLSXFile, FullMin, JsZip) {
+    function (Controller, MessageBox, Filter, FilterOperator, Fragment, JSONModel, Token, formatter, XLSXFile, FullMin, JsZip, MessageToast) {
         "use strict";
 
         return Controller.extend("com.mgc.timesheetdashboardui.controller.View1", {
@@ -29,11 +30,15 @@ sap.ui.define([
                 var oModel = this.getOwnerComponent().getModel();
                 var oDataModel = new sap.ui.model.odata.ODataModel(oModel.sServiceUrl);
                 var batchOperation0 = oDataModel.createBatchOperation("/Employees?$format=json", "GET");
-                var batchArray = [batchOperation0];
+                var batchOperation1 = oDataModel.createBatchOperation("/WbsElement?$format=json", "GET");
+                var batchArray = [batchOperation0, batchOperation1];
                 oDataModel.addBatchReadOperations(batchArray);
                 oDataModel.submitBatch(function (oResult) {
                     try {
                         this.getView().getModel("valueHelp").setProperty("/emp", oResult.__batchResponses[0].data.results);
+                    } catch (err) { }
+                    try {
+                        this.getView().getModel("valueHelp").setProperty("/wbs", oResult.__batchResponses[1].data.results);
                     } catch (err) { }
                     batchPromise.resolve();
                 }.bind(this), function (oError) {
@@ -44,7 +49,8 @@ sap.ui.define([
                 var sfModel = this.getOwnerComponent().getModel("v2");
                 var oSFDataModel = new sap.ui.model.odata.ODataModel(sfModel.sServiceUrl);
                 var ccBatchOperation = oSFDataModel.createBatchOperation("/FOCompany?$format=json", "GET");
-                var sfBatchArray = [ccBatchOperation];
+                var coctchOperation = oSFDataModel.createBatchOperation("/FOCostCenter?$format=json", "GET");
+                var sfBatchArray = [ccBatchOperation, coctchOperation];
                 oSFDataModel.addBatchReadOperations(sfBatchArray);
                 oSFDataModel.submitBatch(function (oResult) {
                     try {
@@ -56,6 +62,9 @@ sap.ui.define([
                             }
                         }
                         this.getView().getModel("valueHelp").setProperty("/company", company);
+                    } catch (err) { }
+                    try {
+                        this.getView().getModel("valueHelp").setProperty("/costcenter", oResult.__batchResponses[1].data.results);
                     } catch (err) { }
                     sfBatchPromise.resolve();
                     //sap.ui.core.BusyIndicator.hide();
@@ -86,6 +95,54 @@ sap.ui.define([
             oCompanyF4HelpCancel: function () {
                 this.CompanyF4Help.close();
             },
+            onCostCenerF4: function () {
+                if (!this.CostCenterF4Help) {
+                    Fragment.load({
+                        name: "com.mgc.timesheetdashboardui.fragment.CostCenterF4Help",
+                        controller: this
+                    }).then(function (oDialog) {
+                        this.CostCenterF4Help = oDialog;
+                        this.getView().addDependent(oDialog);
+                        this.CostCenterF4Help.open();
+                    }.bind(this));
+                } else {
+                    this.CostCenterF4Help.open();
+                }
+            },
+            oCostCenterF4HelpCancel: function () {
+                this.CostCenterF4Help.close();
+            },
+            // filter cost center
+            onSearchCostCenter: function (oEvent) {
+                var sQuery = oEvent.getSource().getValue();
+                var ID = new sap.ui.model.Filter("costcenterExternalObjectID", sap.ui.model.FilterOperator.Contains, sQuery);
+                var Name = new sap.ui.model.Filter("name", sap.ui.model.FilterOperator.Contains, sQuery);
+                var Description = new sap.ui.model.Filter("description", sap.ui.model.FilterOperator.Contains, sQuery);
+                var filters = new sap.ui.model.Filter([ID, Name, Description]);
+                var listassign = sap.ui.getCore().byId("idCostCenterTimeSheetTable");
+                listassign.getBinding("items").filter(filters, "Appliation");
+            },
+            // costcenter selection
+            onSelectCostCenter: function (oEvent) {
+                var sSelectedPath = oEvent.getSource().getBindingContextPath();
+                var sObj = this.getView().getModel("valueHelp").getProperty(sSelectedPath);
+                this.getView().byId("costCenterTimeSheet").setValue(sObj.costcenterExternalObjectID);
+                this.oCostCenterF4HelpCancel();
+            },
+            onWBSF4: function () {
+                if (!this.onWBSF4Help) {
+                    Fragment.load({
+                        name: "com.mgc.timesheetdashboardui.fragment.WBSF4Help",
+                        controller: this
+                    }).then(function (oDialog) {
+                        this.onWBSF4Help = oDialog;
+                        this.getView().addDependent(oDialog);
+                        this.onWBSF4Help.open();
+                    }.bind(this));
+                } else {
+                    this.onWBSF4Help.open();
+                }
+            },
             // filter company
             onSearchCompany: function (oEvent) {
                 var sQuery = oEvent.getSource().getValue();
@@ -95,6 +152,21 @@ sap.ui.define([
                 var filters = new sap.ui.model.Filter([externalCode, name, country]);
                 var listassign = sap.ui.getCore().byId("idCompanyTimesheetTable");
                 listassign.getBinding("items").filter(filters, "Appliation");
+            },
+            onSearchWBSValue: function (oEvent) {
+                var sQuery = oEvent.getParameter("value");
+                var ID = new sap.ui.model.Filter("ID", sap.ui.model.FilterOperator.Contains, sQuery);
+                var NAME = new sap.ui.model.Filter("NAME", sap.ui.model.FilterOperator.Contains, sQuery);
+                var ID_1 = new sap.ui.model.Filter("ID_1", sap.ui.model.FilterOperator.Contains, sQuery);
+                var NAME_1 = new sap.ui.model.Filter("NAME_1", sap.ui.model.FilterOperator.Contains, sQuery);
+                var ID_2 = new sap.ui.model.Filter("ID_2", sap.ui.model.FilterOperator.Contains, sQuery);
+                var NAME_2 = new sap.ui.model.Filter("NAME_2", sap.ui.model.FilterOperator.Contains, sQuery);
+                var COMPANYID = new sap.ui.model.Filter("COMPANYID", sap.ui.model.FilterOperator.Contains, sQuery);
+                var PROJECTMANAGEREMAIL_2 = new sap.ui.model.Filter("PROJECTMANAGEREMAIL_2", sap.ui.model.FilterOperator.Contains, sQuery);
+                var PROJECTMANAGER_2 = new sap.ui.model.Filter("PROJECTMANAGER_2", sap.ui.model.FilterOperator.Contains, sQuery);
+                var filters = new sap.ui.model.Filter([ID, NAME, ID_1, NAME_1, ID_2, NAME_2, COMPANYID, PROJECTMANAGEREMAIL_2, PROJECTMANAGER_2]);
+                var oBinding = oEvent.getSource().getBinding("items");
+                oBinding.filter(filters, "Appliation");
             },
             // resource company
             onSelectCompany: function (oEvent) {
@@ -107,6 +179,18 @@ sap.ui.define([
             getResourceBundle: function () {
                 var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
                 return oResourceBundle;
+            },
+            handleWBSClose: function (oEvent) {
+                if (oEvent.getParameter("selectedContexts") == undefined) {
+                    return;
+                }
+                var oSelectedPath = oEvent.getParameter("selectedContexts")[0].getPath();
+                var oObj = this.getView().getModel("valueHelp").getProperty(oSelectedPath);
+                this.getView().byId("wbsTimeSheet").setValue(oObj.ID + "/" + oObj.ID_1 + "/" + oObj.ID_2);
+            },
+            onChangeF4Help: function (oEvent) {
+                oEvent.getSource().setValue("");
+                MessageToast.show(this.getResourceBundle().getText("selectF4"));
             },
             onSearch: function () {
                 const stdate = this.getView().byId("idStDate").getDateValue();
@@ -124,6 +208,37 @@ sap.ui.define([
                 }
                 var oFilterValues = [];
                 this.getView().byId("timesheetSheetDashboard").setBusy(true);
+                var wbs = this.getView().byId("wbsTimeSheet").getValue();
+                if (wbs !== "") {
+                    var val = wbs.split("/");
+                    var Job = new sap.ui.model.Filter({
+                        path: "Job",
+                        operator: sap.ui.model.FilterOperator.EQ,
+                        value1: val[0]
+                    });
+                    oFilterValues.push(Job);
+                    var Section = new sap.ui.model.Filter({
+                        path: "Section",
+                        operator: sap.ui.model.FilterOperator.EQ,
+                        value1: val[1]
+                    });
+                    oFilterValues.push(Section);
+                    var Phase = new sap.ui.model.Filter({
+                        path: "Phase",
+                        operator: sap.ui.model.FilterOperator.EQ,
+                        value1: val[2]
+                    });
+                    oFilterValues.push(Phase);
+                }
+                var costcenter = this.getView().byId("costCenterTimeSheet").getValue();
+                if (costcenter !== "") {
+                    var CostCenter = new sap.ui.model.Filter({
+                        path: "CostCenter",
+                        operator: sap.ui.model.FilterOperator.EQ,
+                        value1: costcenter
+                    });
+                    oFilterValues.push(CostCenter);
+                }
                 /// Filters for Service call
                 // Date Selection
                 var DateRange = new sap.ui.model.Filter({
@@ -142,13 +257,15 @@ sap.ui.define([
                     });
                     oFilterValues.push(oResource);
                 }
-                var CompanyCode = new sap.ui.model.Filter({
-                    path: "CompanyID",
-                    operator: sap.ui.model.FilterOperator.EQ,
-                    value1: this.CompanyCode
-                });
-                oFilterValues.push(CompanyCode);
-
+                var compnayCode = this.getView().byId("companyTimeSheet").getValue();
+                if (compnayCode !== "") {
+                    var CompanyCode = new sap.ui.model.Filter({
+                        path: "CompanyID",
+                        operator: sap.ui.model.FilterOperator.EQ,
+                        value1: this.CompanyCode
+                    });
+                    oFilterValues.push(CompanyCode);
+                }
                 this.getOwnerComponent().getModel().read("/TimeSheetDetails", {
                     filters: oFilterValues,
                     urlParameters: { "$select": "Date,EmployeeID,EmployeeName,CompanyID,TotalHours,SaveSubmitStatus" },
@@ -230,6 +347,7 @@ sap.ui.define([
                                     TotalHours += Number(oData[k].TotalHours);
                                     obj.hours1 = TotalHours;
                                     obj.EmployeeName = oData[k].EmployeeName;
+                                    obj.Date = oData[k].Date;
                                 }
                                 else if (j == 1) {
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
@@ -237,6 +355,7 @@ sap.ui.define([
                                     TotalHours += Number(oData[k].TotalHours);
                                     obj.hours2 = TotalHours;
                                     obj.EmployeeName = oData[k].EmployeeName;
+                                    obj.Date = oData[k].Date;
                                 }
                                 else if (j == 2) {
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
@@ -244,6 +363,7 @@ sap.ui.define([
                                     TotalHours += Number(oData[k].TotalHours);
                                     obj.hours3 = TotalHours;
                                     obj.EmployeeName = oData[k].EmployeeName;
+                                    obj.Date = oData[k].Date;
                                 }
                                 else if (j == 3) {
                                     //obj.status4 = oData[k].SaveSubmitStatus;
@@ -252,6 +372,7 @@ sap.ui.define([
                                     TotalHours += Number(oData[k].TotalHours);
                                     obj.hours4 = TotalHours;
                                     obj.EmployeeName = oData[k].EmployeeName;
+                                    obj.Date = oData[k].Date;
                                 }
                                 else if (j == 4) {
                                     //obj.status5 = oData[k].SaveSubmitStatus;
@@ -260,6 +381,7 @@ sap.ui.define([
                                     TotalHours += Number(oData[k].TotalHours);
                                     obj.hours5 = TotalHours;
                                     obj.EmployeeName = oData[k].EmployeeName;
+                                    obj.Date = oData[k].Date;
                                 }
                                 else if (j == 5) {
                                     //obj.status6 = oData[k].SaveSubmitStatus;
@@ -268,6 +390,7 @@ sap.ui.define([
                                     TotalHours += Number(oData[k].TotalHours);
                                     obj.hours6 = TotalHours;
                                     obj.EmployeeName = oData[k].EmployeeName;
+                                    obj.Date = oData[k].Date;
                                 }
                                 else if (j == 6) {
                                     //obj.status7 = oData[k].SaveSubmitStatus;
@@ -276,6 +399,7 @@ sap.ui.define([
                                     TotalHours += Number(oData[k].TotalHours);
                                     obj.hours7 = TotalHours;
                                     obj.EmployeeName = oData[k].EmployeeName;
+                                    obj.Date = oData[k].Date;
                                 }
                             }
                         }
@@ -322,6 +446,95 @@ sap.ui.define([
                     });
                 }
             },
+            onHoursSelection: function (oEvent) {
+                sap.ui.core.BusyIndicator.show(-1);
+                var SelectedPath = oEvent.getSource().getParent().getBindingContextPath();
+                var oObj = this.getView().getModel("valueHelp").getProperty(SelectedPath);
+                var Hours = Number(oEvent.getSource().getTitle());
+                if(Hours == 0){
+                    MessageToast.show(this.getResourceBundle().getText("noData"))
+                    return;
+                }
+                if (Hours == oObj.hours1) {
+                    var Date = oObj.Date1;
+                }
+                else if (Hours == oObj.hours2) {
+                    Date = oObj.Date2;
+                }
+                else if (Hours == oObj.hours3) {
+                    Date = oObj.Date3;
+                }
+                else if (Hours == oObj.hours4) {
+                    Date = oObj.Date4;
+                }
+                else if (Hours == oObj.hours5) {
+                    Date = oObj.Date5;
+                }
+                else if (Hours == oObj.hours6) {
+                    Date = oObj.Date6;
+                }
+                else if (Hours == oObj.hours7) {
+                    Date = oObj.Date7;
+                }
+                var oFilterValues = [];
+                /// Filters for Service call
+                // Date Selection
+                var DateFilter = new sap.ui.model.Filter({
+                    path: "Date",
+                    operator: sap.ui.model.FilterOperator.EQ,
+                    value1: Date
+                });
+                oFilterValues.push(DateFilter);
+                // Resource Selection Selection
+                var oResource = new sap.ui.model.Filter({
+                    path: "EmployeeID",
+                    operator: sap.ui.model.FilterOperator.EQ,
+                    value1: oObj.EmployeeID
+                });
+                oFilterValues.push(oResource);
+                this.getOwnerComponent().getModel().read("/TimeSheetDetails", {
+                    filters: oFilterValues,
+                    urlParameters: { "$select": "Date,AppName,EmployeeID,EmployeeName,CompanyID,PayCode,CostCenter,Activity,WorkOrder,Job,Section,Phase,ManagerApprovalName,PayrollApprovalName,TotalHours,SaveSubmitStatus,PayrollApprovalStatus" },
+                    sorters: [
+                        new sap.ui.model.Sorter("Date", /*descending*/false)
+                    ],
+                    success: function (odata) {
+                        if (odata.results.length == 0) {
+                            MessageBox.information(this.getResourceBundle().getText("infoData"));
+                            return;
+                        }
+                        else {
+                            this.getView().getModel("valueHelp").setProperty("/timePeriod", odata.results);
+                            this.openTimesheetDetail(Hours);
+                        }
+                    }.bind(this),
+                    error: function (oError) {
+                        sap.ui.core.BusyIndicator.hide();
+                        MessageBox.error(this.getResourceBundle().getText("errorTimesheet"));
+                    }.bind(this)
+                });
+            },
+            openTimesheetDetail: function (Hours) {
+                if (!this.onTimePeriod) {
+                    Fragment.load({
+                        name: "com.mgc.timesheetdashboardui.fragment.TimePeriod",
+                        controller: this
+                    }).then(function (oDialog) {
+                        this.onTimePeriod = oDialog;
+                        this.getView().addDependent(oDialog);
+                        this.onTimePeriod.open();
+                        sap.ui.getCore().byId("idTimesheetTotalValues").setNumber(Hours);
+                        sap.ui.core.BusyIndicator.hide();
+                    }.bind(this));
+                } else {
+                    this.onTimePeriod.open();
+                    sap.ui.getCore().byId("idTimesheetTotalValues").setNumber(Hours);
+                    sap.ui.core.BusyIndicator.hide();
+                }
+            },
+            timeSheetDialogCancel: function () {
+                this.onTimePeriod.close();
+            },
             exportTimeData: function () {
                 var rows = [];
                 var fileName = "TimesheetStatusDashboard.xlsx";
@@ -365,7 +578,6 @@ sap.ui.define([
                         } catch (err) { }
                         rows.push(obj);
                     }
-
                 }
                 var workbook = XLSX.utils.book_new();
                 var worksheet = XLSX.utils.json_to_sheet(rows);

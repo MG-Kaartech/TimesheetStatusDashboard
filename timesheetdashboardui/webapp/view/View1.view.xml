@@ -27,15 +27,21 @@
                 showFilterConfiguration="true"
             >
                 <fb:filterGroupItems>
-                <fb:FilterGroupItem
-                    groupName="group1"
-                    name="Company"
-                    label="{i18n>company}"
-                    visibleInFilterBar="true">
-                    <fb:control>
-                        <Input id="companyTimeSheet" placeholder="{i18n>company}" showValueHelp="true" valueHelpRequest="onCompanyF4"/>
-                    </fb:control>
-                </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        groupName="group1"
+                        name="Company"
+                        label="{i18n>company}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <Input
+                                id="companyTimeSheet"
+                                placeholder="{i18n>company}"
+                                showValueHelp="true"
+                                valueHelpRequest="onCompanyF4"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
                     <fb:FilterGroupItem
                         groupName="group1"
                         name="Resource"
@@ -48,6 +54,38 @@
                                 placeholder="{i18n>resource}"
                                 showValueHelp="true"
                                 valueHelpRequest="handleValueHelp"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        groupName="group1"
+                        name="Cost Center"
+                        label="{i18n>costCenter}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <Input
+                                id="costCenterTimeSheet"
+                                placeholder="{i18n>costCenter}"
+                                showValueHelp="true"
+                                valueHelpRequest="onCostCenerF4"
+                                liveChange="onChangeF4Help"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        groupName="group1"
+                        name="WBS"
+                        label="{i18n>wbs}"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <Input
+                                id="wbsTimeSheet"
+                                placeholder="{i18n>wbs}"
+                                showValueHelp="true"
+                                valueHelpRequest="onWBSF4"
+                                liveChange="onChangeF4Help"
                             />
                         </fb:control>
                     </fb:FilterGroupItem>
@@ -93,9 +131,9 @@
                 growing="true"
                 growingThreshold="50"
                 growingScrollToLoad="true"
-                columns="{valueHelp>/Columns}" 
+                columns="{valueHelp>/Columns}"
             >
-            <headerToolbar>
+                <headerToolbar>
                     <OverflowToolbar>
                         <ToolbarSpacer />
                         <Button
@@ -106,24 +144,56 @@
                         />
                     </OverflowToolbar>
                 </headerToolbar>
-                <columns >
+                <columns>
                     <Column width="5rem">
                         <Label text="{valueHelp>date}" />
                     </Column>
                 </columns>
                 <items>
-                    <ColumnListItem type="Active" press="onTimePeriodListItemSelect">
+                    <ColumnListItem
+                        type="Active"
+                        press="onTimePeriodListItemSelect"
+                    >
                         <cells>
-                            <ObjectIdentifier title="{valueHelp>EmployeeID}"/>
-                            <ObjectIdentifier title="{valueHelp>EmployeeName}"/>
-                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours1'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status1'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
-                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours2'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status2'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
-                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours3'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status3'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
-                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours4'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status4'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
-                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours5'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status5'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
-                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours6'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status6'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
-                            <ObjectIdentifier title="{parts: [ {path: 'valueHelp>hours7'} ], formatter: '.formatter.HoursValue' }" text="{ parts: [ {path: 'valueHelp>status7'} ], formatter: '.formatter.SaveSubmitStatusText' }" />
-
+                            <ObjectIdentifier title="{valueHelp>EmployeeID}" />
+                            <ObjectIdentifier
+                                title="{valueHelp>EmployeeName}"
+                            />
+                            <ObjectIdentifier
+                                title="{parts: [ {path: 'valueHelp>hours1'} ], formatter: '.formatter.HoursValue' }"
+                                text="{ parts: [ {path: 'valueHelp>status1'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                titleActive="true" titlePress="onHoursSelection"
+                            />
+                            <ObjectIdentifier
+                                title="{parts: [ {path: 'valueHelp>hours2'} ], formatter: '.formatter.HoursValue' }"
+                                text="{ parts: [ {path: 'valueHelp>status2'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                titleActive="true" titlePress="onHoursSelection"
+                            />
+                            <ObjectIdentifier
+                                title="{parts: [ {path: 'valueHelp>hours3'} ], formatter: '.formatter.HoursValue' }"
+                                text="{ parts: [ {path: 'valueHelp>status3'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                titleActive="true" titlePress="onHoursSelection"
+                            />
+                            <ObjectIdentifier
+                                title="{parts: [ {path: 'valueHelp>hours4'} ], formatter: '.formatter.HoursValue' }"
+                                text="{ parts: [ {path: 'valueHelp>status4'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                titleActive="true" titlePress="onHoursSelection"
+                            />
+                            <ObjectIdentifier
+                                title="{parts: [ {path: 'valueHelp>hours5'} ], formatter: '.formatter.HoursValue' }"
+                                text="{ parts: [ {path: 'valueHelp>status5'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                titleActive="true" titlePress="onHoursSelection"
+                            />
+                            <ObjectIdentifier
+                                title="{parts: [ {path: 'valueHelp>hours6'} ], formatter: '.formatter.HoursValue' }"
+                                text="{ parts: [ {path: 'valueHelp>status6'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                titleActive="true" titlePress="onHoursSelection"
+                            />
+                            <ObjectIdentifier
+                                title="{parts: [ {path: 'valueHelp>hours7'} ], formatter: '.formatter.HoursValue' }"
+                                text="{ parts: [ {path: 'valueHelp>status7'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                titleActive="true" titlePress="onHoursSelection"
+                            />
                         </cells>
                     </ColumnListItem>
                 </items>

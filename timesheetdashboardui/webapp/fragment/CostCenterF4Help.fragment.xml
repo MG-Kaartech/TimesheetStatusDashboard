@@ -1,0 +1,61 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+>
+    <Dialog
+        class="sapUiContentPadding"
+        title="{i18n>costCenter}"
+        contentWidth="35%"
+    >
+        <content>
+            <Table id="idCostCenterTimeSheetTable" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="50" growingScrollToLoad="true"
+            items="{
+			path: 'valueHelp>/costcenter',
+			sorter: {
+				path: 'name'
+			}
+		}">
+                <headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<SearchField search="onSearchCostCenter" liveChange="onSearchCostCenter"></SearchField>
+					<ToolbarSpacer />
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>id}"  />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>name}"  />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>desc}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" press="onSelectCostCenter">
+                        <cells>
+                            <Text text="{valueHelp>costcenterExternalObjectID}"/>
+                            <Text text="{valueHelp>name}" />
+                            <Text text="{valueHelp>description}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    type="Negative"
+                    text="Close"
+                    press="oCostCenterF4HelpCancel"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>
