@@ -19,8 +19,8 @@
                 <Text text="{valueHelp>ID_2}" />
                 <Text text="{valueHelp>NAME_2}" />
                 <Text text="{valueHelp>COMPANYID}" />
-                <Text text="{valueHelp>PROJECTMANAGEREMAIL_2}" />
-                <Text text="{valueHelp>PROJECTMANAGER_2}" />
+                <Text text="{valueHelp>PROJECTMANAGEREMAIL}" />
+                <Text text="{valueHelp>PROJECTMANAGER}" />
             </cells>
         </ColumnListItem>
         <columns>

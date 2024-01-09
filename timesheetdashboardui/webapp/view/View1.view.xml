@@ -162,37 +162,37 @@
                             <ObjectIdentifier
                                 title="{parts: [ {path: 'valueHelp>hours1'} ], formatter: '.formatter.HoursValue' }"
                                 text="{ parts: [ {path: 'valueHelp>status1'} ], formatter: '.formatter.SaveSubmitStatusText' }"
-                                titleActive="true" titlePress="onHoursSelection"
+                                titleActive="true" titlePress="onHoursSelection" tooltip="{valueHelp>Date1}"
                             />
                             <ObjectIdentifier
                                 title="{parts: [ {path: 'valueHelp>hours2'} ], formatter: '.formatter.HoursValue' }"
                                 text="{ parts: [ {path: 'valueHelp>status2'} ], formatter: '.formatter.SaveSubmitStatusText' }"
-                                titleActive="true" titlePress="onHoursSelection"
+                                titleActive="true" titlePress="onHoursSelection" tooltip="{valueHelp>Date2}"
                             />
                             <ObjectIdentifier
                                 title="{parts: [ {path: 'valueHelp>hours3'} ], formatter: '.formatter.HoursValue' }"
                                 text="{ parts: [ {path: 'valueHelp>status3'} ], formatter: '.formatter.SaveSubmitStatusText' }"
-                                titleActive="true" titlePress="onHoursSelection"
+                                titleActive="true" titlePress="onHoursSelection" tooltip="{valueHelp>Date3}"
                             />
                             <ObjectIdentifier
                                 title="{parts: [ {path: 'valueHelp>hours4'} ], formatter: '.formatter.HoursValue' }"
                                 text="{ parts: [ {path: 'valueHelp>status4'} ], formatter: '.formatter.SaveSubmitStatusText' }"
-                                titleActive="true" titlePress="onHoursSelection"
+                                titleActive="true" titlePress="onHoursSelection" tooltip="{valueHelp>Date4}"
                             />
                             <ObjectIdentifier
                                 title="{parts: [ {path: 'valueHelp>hours5'} ], formatter: '.formatter.HoursValue' }"
                                 text="{ parts: [ {path: 'valueHelp>status5'} ], formatter: '.formatter.SaveSubmitStatusText' }"
-                                titleActive="true" titlePress="onHoursSelection"
+                                titleActive="true" titlePress="onHoursSelection" tooltip="{valueHelp>Date5}"
                             />
                             <ObjectIdentifier
                                 title="{parts: [ {path: 'valueHelp>hours6'} ], formatter: '.formatter.HoursValue' }"
                                 text="{ parts: [ {path: 'valueHelp>status6'} ], formatter: '.formatter.SaveSubmitStatusText' }"
-                                titleActive="true" titlePress="onHoursSelection"
+                                titleActive="true" titlePress="onHoursSelection" tooltip="{valueHelp>Date6}"
                             />
                             <ObjectIdentifier
                                 title="{parts: [ {path: 'valueHelp>hours7'} ], formatter: '.formatter.HoursValue' }"
                                 text="{ parts: [ {path: 'valueHelp>status7'} ], formatter: '.formatter.SaveSubmitStatusText' }"
-                                titleActive="true" titlePress="onHoursSelection"
+                                titleActive="true" titlePress="onHoursSelection" tooltip="{valueHelp>Date7}"
                             />
                         </cells>
                     </ColumnListItem>

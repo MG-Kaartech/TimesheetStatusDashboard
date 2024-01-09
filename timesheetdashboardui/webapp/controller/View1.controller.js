@@ -26,6 +26,7 @@ sap.ui.define([
                 valueHelpModel.setSizeLimit(100000);
                 var batchPromise = jQuery.Deferred();
                 var sfBatchPromise = jQuery.Deferred();
+                this.getUser(); // get current loggedin user
                 this.getView().setModel(valueHelpModel, "valueHelp");
                 var oModel = this.getOwnerComponent().getModel();
                 var oDataModel = new sap.ui.model.odata.ODataModel(oModel.sServiceUrl);
@@ -78,6 +79,27 @@ sap.ui.define([
                         sap.ui.core.BusyIndicator.hide();
                     });
             },
+            getBaseURL: function () {
+                return sap.ui.require.toUrl("com/mgc/timesheetdashboardui");
+            },
+            // get user details
+            getUser: function () {
+                var that = this;
+                const e = this.getBaseURL() + "/user-api/currentUser";
+                $.ajax({
+                    url: e,
+                    type: "GET",
+                    success: function (e) {
+                        that.loginName = e.firstname;
+                        that.logedinEmail = e.email;
+                    },
+                    error: function (e) {
+                        console.log(e);
+                        MessageBox.error(that.getResourceBundle().getText("errorUserDetails"));
+                    }
+                });
+            },
+            //load company fragment
             onCompanyF4: function () {
                 if (!this.CompanyF4Help) {
                     Fragment.load({
@@ -95,6 +117,7 @@ sap.ui.define([
             oCompanyF4HelpCancel: function () {
                 this.CompanyF4Help.close();
             },
+            //load costcenter fragment
             onCostCenerF4: function () {
                 if (!this.CostCenterF4Help) {
                     Fragment.load({
@@ -129,6 +152,7 @@ sap.ui.define([
                 this.getView().byId("costCenterTimeSheet").setValue(sObj.costcenterExternalObjectID);
                 this.oCostCenterF4HelpCancel();
             },
+            //load wbs fragment
             onWBSF4: function () {
                 if (!this.onWBSF4Help) {
                     Fragment.load({
@@ -153,6 +177,7 @@ sap.ui.define([
                 var listassign = sap.ui.getCore().byId("idCompanyTimesheetTable");
                 listassign.getBinding("items").filter(filters, "Appliation");
             },
+            //filter wbs
             onSearchWBSValue: function (oEvent) {
                 var sQuery = oEvent.getParameter("value");
                 var ID = new sap.ui.model.Filter("ID", sap.ui.model.FilterOperator.Contains, sQuery);
@@ -162,8 +187,8 @@ sap.ui.define([
                 var ID_2 = new sap.ui.model.Filter("ID_2", sap.ui.model.FilterOperator.Contains, sQuery);
                 var NAME_2 = new sap.ui.model.Filter("NAME_2", sap.ui.model.FilterOperator.Contains, sQuery);
                 var COMPANYID = new sap.ui.model.Filter("COMPANYID", sap.ui.model.FilterOperator.Contains, sQuery);
-                var PROJECTMANAGEREMAIL_2 = new sap.ui.model.Filter("PROJECTMANAGEREMAIL_2", sap.ui.model.FilterOperator.Contains, sQuery);
-                var PROJECTMANAGER_2 = new sap.ui.model.Filter("PROJECTMANAGER_2", sap.ui.model.FilterOperator.Contains, sQuery);
+                var PROJECTMANAGEREMAIL_2 = new sap.ui.model.Filter("PROJECTMANAGEREMAIL", sap.ui.model.FilterOperator.Contains, sQuery);
+                var PROJECTMANAGER_2 = new sap.ui.model.Filter("PROJECTMANAGER", sap.ui.model.FilterOperator.Contains, sQuery);
                 var filters = new sap.ui.model.Filter([ID, NAME, ID_1, NAME_1, ID_2, NAME_2, COMPANYID, PROJECTMANAGEREMAIL_2, PROJECTMANAGER_2]);
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter(filters, "Appliation");
@@ -192,7 +217,8 @@ sap.ui.define([
                 oEvent.getSource().setValue("");
                 MessageToast.show(this.getResourceBundle().getText("selectF4"));
             },
-            onSearch: function () {
+            //filters to get timesheetdetails
+            oSelectedFilters: function (Date, EmployeeID) {
                 const stdate = this.getView().byId("idStDate").getDateValue();
                 const fndate = this.getView().byId("idFnDate").getDateValue();
                 const resInput = this.getView().byId("resInput").getTokens();
@@ -202,12 +228,11 @@ sap.ui.define([
                 }
                 const diffTime = Math.abs(stdate - fndate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                if (diffDays > 7) {
+                if (diffDays >= 7) {
                     MessageBox.error(this.getResourceBundle().getText("errorMax"));
                     return;
                 }
                 var oFilterValues = [];
-                this.getView().byId("timesheetSheetDashboard").setBusy(true);
                 var wbs = this.getView().byId("wbsTimeSheet").getValue();
                 if (wbs !== "") {
                     var val = wbs.split("/");
@@ -241,13 +266,32 @@ sap.ui.define([
                 }
                 /// Filters for Service call
                 // Date Selection
-                var DateRange = new sap.ui.model.Filter({
-                    path: "Date",
-                    operator: sap.ui.model.FilterOperator.BT,
-                    value1: this.getView().byId("idStDate").getValue(),
-                    value2: this.getView().byId("idFnDate").getValue()
-                });
-                oFilterValues.push(DateRange);
+                if (Date !== undefined) { // getting data from lineitem hour selection
+                    var Date = new sap.ui.model.Filter({
+                        path: "Date",
+                        operator: sap.ui.model.FilterOperator.EQ,
+                        value1: Date
+                    });
+                    oFilterValues.push(Date);
+                } else {
+                    var DateRange = new sap.ui.model.Filter({
+                        path: "Date",
+                        operator: sap.ui.model.FilterOperator.BT,
+                        value1: this.getView().byId("idStDate").getValue(),
+                        value2: this.getView().byId("idFnDate").getValue()
+                    });
+                    oFilterValues.push(DateRange);
+                }
+
+                if (EmployeeID !== undefined) { // getting data from lineitem hour selection
+                    var empid = new sap.ui.model.Filter({
+                        path: "EmployeeID",
+                        operator: sap.ui.model.FilterOperator.EQ,
+                        value1: EmployeeID
+                    });
+                    oFilterValues.push(empid);
+                }
+
                 // Resource Selection Selection
                 for (let i = 0; i < resInput.length; i++) {
                     var oResource = new sap.ui.model.Filter({
@@ -266,9 +310,18 @@ sap.ui.define([
                     });
                     oFilterValues.push(CompanyCode);
                 }
+                return oFilterValues;
+            },
+            //get timesheet details
+            onSearch: function () {
+                var ofilters = this.oSelectedFilters();
+                if (ofilters == undefined) {
+                    return;
+                }
+                this.getView().byId("timesheetSheetDashboard").setBusy(true);
                 this.getOwnerComponent().getModel().read("/TimeSheetDetails", {
-                    filters: oFilterValues,
-                    urlParameters: { "$select": "Date,EmployeeID,EmployeeName,CompanyID,TotalHours,SaveSubmitStatus" },
+                    filters: ofilters,
+                    urlParameters: { "$select": "Date,EmployeeID,EmployeeName,CompanyID,TotalHours,TotalHoursPercentage,SaveSubmitStatus" },
                     sorters: [
                         new sap.ui.model.Sorter("Date", /*descending*/false) // "Sorter" required from "sap/ui/model/Sorter"
                     ],
@@ -290,9 +343,11 @@ sap.ui.define([
                     }.bind(this),
                     error: function (oError) {
                         MessageBox.error(this.getResourceBundle().getText("errorTimesheet"));
+                        this.getView().byId("timesheetSheetDashboard").setBusy(false);
                     }.bind(this)
                 });
             },
+            // arrange columns for table
             arrangeColData: function (unique) {
                 var that = this;
                 const dates = [];
@@ -305,6 +360,7 @@ sap.ui.define([
                 dates.unshift({ "date": "Employee ID" })
                 that.getView().getModel("valueHelp").setProperty("/Columns", dates);
             },
+            //load resource fragment
             handleValueHelp: function (oEvent) {
                 var sInputValue = oEvent.getSource().getValue(),
                     oView = this.getView();
@@ -331,75 +387,76 @@ sap.ui.define([
                     oValueHelpDialog.open(sInputValue);
                 });
             },
+            //arrnage rows for table
             arrangeData: function (oData, unique1, unique2) {
                 var finalArray = [];
                 for (var i = 0; i < unique1.length; i++) {
                     var obj = {};
                     for (var j = 0; j < unique2.length; j++) {
                         obj.EmployeeID = unique1[i];
-                        var TotalHours = 0;
+                        var TotalHoursPercentage = 0;
                         var Status = "";
                         for (var k = 0; k < oData.length; k++) {
                             if (oData[k].EmployeeID == unique1[i] && oData[k].Date == unique2[j]) {
                                 if (j == 0) {
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
                                     obj.status1 = Status;
-                                    TotalHours += Number(oData[k].TotalHours);
-                                    obj.hours1 = TotalHours;
+                                    TotalHoursPercentage += Number(oData[k].TotalHoursPercentage);
+                                    obj.hours1 = TotalHoursPercentage;
                                     obj.EmployeeName = oData[k].EmployeeName;
-                                    obj.Date = oData[k].Date;
+                                    obj.Date1 = oData[k].Date;
                                 }
                                 else if (j == 1) {
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
                                     obj.status2 = Status;
-                                    TotalHours += Number(oData[k].TotalHours);
-                                    obj.hours2 = TotalHours;
+                                    TotalHoursPercentage += Number(oData[k].TotalHoursPercentage);
+                                    obj.hours2 = TotalHoursPercentage;
                                     obj.EmployeeName = oData[k].EmployeeName;
-                                    obj.Date = oData[k].Date;
+                                    obj.Date2 = oData[k].Date;
                                 }
                                 else if (j == 2) {
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
                                     obj.status3 = Status;
-                                    TotalHours += Number(oData[k].TotalHours);
-                                    obj.hours3 = TotalHours;
+                                    TotalHoursPercentage += Number(oData[k].TotalHoursPercentage);
+                                    obj.hours3 = TotalHoursPercentage;
                                     obj.EmployeeName = oData[k].EmployeeName;
-                                    obj.Date = oData[k].Date;
+                                    obj.Date3 = oData[k].Date;
                                 }
                                 else if (j == 3) {
                                     //obj.status4 = oData[k].SaveSubmitStatus;
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
                                     obj.status4 = Status;
-                                    TotalHours += Number(oData[k].TotalHours);
-                                    obj.hours4 = TotalHours;
+                                    TotalHoursPercentage += Number(oData[k].TotalHoursPercentage);
+                                    obj.hours4 = TotalHoursPercentage;
                                     obj.EmployeeName = oData[k].EmployeeName;
-                                    obj.Date = oData[k].Date;
+                                    obj.Date4 = oData[k].Date;
                                 }
                                 else if (j == 4) {
                                     //obj.status5 = oData[k].SaveSubmitStatus;
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
                                     obj.status5 = Status;
-                                    TotalHours += Number(oData[k].TotalHours);
-                                    obj.hours5 = TotalHours;
+                                    TotalHoursPercentage += Number(oData[k].TotalHoursPercentage);
+                                    obj.hours5 = TotalHoursPercentage;
                                     obj.EmployeeName = oData[k].EmployeeName;
-                                    obj.Date = oData[k].Date;
+                                    obj.Date5 = oData[k].Date;
                                 }
                                 else if (j == 5) {
                                     //obj.status6 = oData[k].SaveSubmitStatus;
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
                                     obj.status6 = Status;
-                                    TotalHours += Number(oData[k].TotalHours);
-                                    obj.hours6 = TotalHours;
+                                    TotalHoursPercentage += Number(oData[k].TotalHoursPercentage);
+                                    obj.hours6 = TotalHoursPercentage;
                                     obj.EmployeeName = oData[k].EmployeeName;
-                                    obj.Date = oData[k].Date;
+                                    obj.Date6 = oData[k].Date;
                                 }
                                 else if (j == 6) {
                                     //obj.status7 = oData[k].SaveSubmitStatus;
                                     Status = Status + "#" + oData[k].SaveSubmitStatus;
                                     obj.status7 = Status;
-                                    TotalHours += Number(oData[k].TotalHours);
-                                    obj.hours7 = TotalHours;
+                                    TotalHoursPercentage += Number(oData[k].TotalHoursPercentage);
+                                    obj.hours7 = TotalHoursPercentage;
                                     obj.EmployeeName = oData[k].EmployeeName;
-                                    obj.Date = oData[k].Date;
+                                    obj.Date7 = oData[k].Date;
                                 }
                             }
                         }
@@ -447,54 +504,19 @@ sap.ui.define([
                 }
             },
             onHoursSelection: function (oEvent) {
-                sap.ui.core.BusyIndicator.show(-1);
                 var SelectedPath = oEvent.getSource().getParent().getBindingContextPath();
                 var oObj = this.getView().getModel("valueHelp").getProperty(SelectedPath);
                 var Hours = Number(oEvent.getSource().getTitle());
-                if(Hours == 0){
+                if (Hours == 0) {
                     MessageToast.show(this.getResourceBundle().getText("noData"))
                     return;
                 }
-                if (Hours == oObj.hours1) {
-                    var Date = oObj.Date1;
-                }
-                else if (Hours == oObj.hours2) {
-                    Date = oObj.Date2;
-                }
-                else if (Hours == oObj.hours3) {
-                    Date = oObj.Date3;
-                }
-                else if (Hours == oObj.hours4) {
-                    Date = oObj.Date4;
-                }
-                else if (Hours == oObj.hours5) {
-                    Date = oObj.Date5;
-                }
-                else if (Hours == oObj.hours6) {
-                    Date = oObj.Date6;
-                }
-                else if (Hours == oObj.hours7) {
-                    Date = oObj.Date7;
-                }
-                var oFilterValues = [];
-                /// Filters for Service call
-                // Date Selection
-                var DateFilter = new sap.ui.model.Filter({
-                    path: "Date",
-                    operator: sap.ui.model.FilterOperator.EQ,
-                    value1: Date
-                });
-                oFilterValues.push(DateFilter);
-                // Resource Selection Selection
-                var oResource = new sap.ui.model.Filter({
-                    path: "EmployeeID",
-                    operator: sap.ui.model.FilterOperator.EQ,
-                    value1: oObj.EmployeeID
-                });
-                oFilterValues.push(oResource);
+                var Date = oEvent.getSource().getTooltip();
+                sap.ui.core.BusyIndicator.show(-1);
+                var ofilters = this.oSelectedFilters(Date, oObj.EmployeeID);
                 this.getOwnerComponent().getModel().read("/TimeSheetDetails", {
-                    filters: oFilterValues,
-                    urlParameters: { "$select": "Date,AppName,EmployeeID,EmployeeName,CompanyID,PayCode,CostCenter,Activity,WorkOrder,Job,Section,Phase,ManagerApprovalName,PayrollApprovalName,TotalHours,SaveSubmitStatus,PayrollApprovalStatus" },
+                    filters: ofilters,
+                    urlParameters: { "$select": "Date,AppName,EmployeeID,EmployeeName,CompanyID,PayCode,CostCenter,Activity,WorkOrder,Job,Section,Phase,ManagerApprovalName,PayrollApprovalName,TotalHours,TotalHoursPercentage,SaveSubmitStatus,PayrollApprovalStatus" },
                     sorters: [
                         new sap.ui.model.Sorter("Date", /*descending*/false)
                     ],
@@ -514,6 +536,7 @@ sap.ui.define([
                     }.bind(this)
                 });
             },
+            //data for popup
             openTimesheetDetail: function (Hours) {
                 if (!this.onTimePeriod) {
                     Fragment.load({
@@ -534,7 +557,9 @@ sap.ui.define([
             },
             timeSheetDialogCancel: function () {
                 this.onTimePeriod.close();
+                this.getView().byId("timesheetSheetDashboard").setBusy(false);
             },
+            //export timesheet details report
             exportTimeData: function () {
                 var rows = [];
                 var fileName = "TimesheetStatusDashboard.xlsx";
@@ -549,32 +574,32 @@ sap.ui.define([
                         obj[aa[0].date] = data.EmployeeID;
                         obj[aa[1].date] = data.EmployeeName;
                         try {
-                            obj[aa[2].date] = this.SaveSubmitStatusText(data.status1);
-                            obj.Hours1 = this.HoursValue(data.hours1);
+                            obj[aa[2].date] = formatter.SaveSubmitStatusText(data.status1);
+                            obj.Hours1 = formatter.HoursValue(data.hours1);
                         } catch (err) { }
                         try {
-                            obj[aa[3].date] = this.SaveSubmitStatusText(data.status2);
-                            obj.Hours2 = this.HoursValue(data.hours2);
+                            obj[aa[3].date] = formatter.SaveSubmitStatusText(data.status2);
+                            obj.Hours2 = formatter.HoursValue(data.hours2);
                         } catch (err) { }
                         try {
-                            obj[aa[4].date] = this.SaveSubmitStatusText(data.status3);
-                            obj.Hours3 = this.HoursValue(data.hours3);
+                            obj[aa[4].date] = formatter.SaveSubmitStatusText(data.status3);
+                            obj.Hours3 = formatter.HoursValue(data.hours3);
                         } catch (err) { }
                         try {
-                            obj[aa[5].date] = this.SaveSubmitStatusText(data.status4);
-                            obj.Hours4 = this.HoursValue(data.hours4);
+                            obj[aa[5].date] = formatter.SaveSubmitStatusText(data.status4);
+                            obj.Hours4 = formatter.HoursValue(data.hours4);
                         } catch (err) { }
                         try {
-                            obj[aa[6].date] = this.SaveSubmitStatusText(data.status5);
-                            obj.Hours5 = this.HoursValue(data.hours5);
+                            obj[aa[6].date] = formatter.SaveSubmitStatusText(data.status5);
+                            obj.Hours5 = formatter.HoursValue(data.hours5);
                         } catch (err) { }
                         try {
-                            obj[aa[7].date] = this.SaveSubmitStatusText(data.status6);
-                            obj.Hours6 = this.HoursValue(data.hours6);
+                            obj[aa[7].date] = formatter.SaveSubmitStatusText(data.status6);
+                            obj.Hours6 = formatter.HoursValue(data.hours6);
                         } catch (err) { }
                         try {
-                            obj[aa[8].date] = this.SaveSubmitStatusText(data.status7);
-                            obj.Hours7 = this.HoursValue(data.hours7);
+                            obj[aa[8].date] = formatter.SaveSubmitStatusText(data.status7);
+                            obj.Hours7 = formatter.HoursValue(data.hours7);
                         } catch (err) { }
                         rows.push(obj);
                     }
@@ -583,32 +608,8 @@ sap.ui.define([
                 var worksheet = XLSX.utils.json_to_sheet(rows);
                 XLSX.utils.book_append_sheet(workbook, worksheet, "TimesheetStatusDashboard");
                 XLSX.writeFile(workbook, fileName, { compression: true });
-            },
-            SaveSubmitStatusText: function (status) {
-                var count = 0;
-                if (status == null || status == "" || status == undefined) {
-                    return "Open";
-                }
-                else {
-                    status.split("#").forEach(index => {
-                        if (index !== "" && index != 'Approved') {
-                            count++;
-                        }
-                    })
-                }
-                if (count == 0) {
-                    return "Approved";
-                } else {
-                    return "Inprogress";
-                }
-            },
-            HoursValue: function (val) {
-                if (val == null || val == undefined || val == "") {
-                    return 0;
-                }
-                else {
-                    return val;
-                }
             }
         });
     });
+
+

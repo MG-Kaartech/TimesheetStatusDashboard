@@ -81,6 +81,18 @@
                             minScreenWidth="phone"
                             demandPopin="true"
                         >
+                            <Text text="{i18n>receivingUnit}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
+                            <Text text="{i18n>sendingUnit}" />
+                        </Column>
+                        <Column
+                            minScreenWidth="phone"
+                            demandPopin="true"
+                        >
                             <Text text="{i18n>workOrder}" />
                         </Column>
                         <Column
@@ -124,6 +136,8 @@
                                 <Text text="{ parts: [ {path: 'valueHelp>PayCode'} ], formatter: '.formatter.ValueCheckName'}"/>
                                 <Text text="{ parts: [ {path: 'valueHelp>CostCenter'} ], formatter: '.formatter.ValueCheckName'}"/>
                                 <Text text="{ parts: [ {path: 'valueHelp>Activity'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>ReceivingUnitTruck'} ], formatter: '.formatter.ValueCheckName'}"/>
+                                <Text text="{ parts: [ {path: 'valueHelp>SendingUnitTrailer'} ], formatter: '.formatter.ValueCheckName'}"/>
                                 <Text text="{ parts: [ {path: 'valueHelp>WorkOrder'} ], formatter: '.formatter.ValueCheckName'}"/>
                                 <Text text="{ parts: [ {path: 'valueHelp>Job'} ], formatter: '.formatter.ValueCheckName'}"/>
                                 <Text text="{ parts: [ {path: 'valueHelp>Section'} ], formatter: '.formatter.ValueCheckName'}"/>
